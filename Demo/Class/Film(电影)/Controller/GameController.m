@@ -51,11 +51,7 @@
 
 #pragma mark - 初始化各个view
 -(void)setUpViews{
-    NSLog(@"这是小彬彬");
-    NSLog(@"这是小彬彬");
-    NSLog(@"这是小彬彬");
-    NSLog(@"这是小彬彬");
-    NSLog(@"这是小彬彬");
+    
 
     UICollectionViewFlowLayout *flowLayout= [[UICollectionViewFlowLayout alloc]init];
     
