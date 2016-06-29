@@ -25,6 +25,7 @@
 #import "ZQPlayerView.h"
 #import "YZZUtilities.h"
 #import "UIView+ViewFrameGeometry.h"
+#import "MJRefresh.h"
 /*
  *课程表
  *
@@ -129,6 +130,14 @@
 #endif
 
 #define _ZQHttpTool [ZQHttpTool shareInstance]
+
+
+typedef NS_ENUM(NSInteger, ReloadDiretion) {
+    
+    ReloadDiretionFirst=1,
+    ReloadDiretionDown=2,
+    ReloadDiretionTop=3
+};
 
 
 
