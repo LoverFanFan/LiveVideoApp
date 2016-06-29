@@ -22,6 +22,7 @@
 @implementation GameController
 {
     BOOL     _isLive;
+    
 }
 
 -(NSMutableArray *)dataSource{
