@@ -21,8 +21,8 @@
 
 @implementation GameController
 {
-    BOOL     _isLive;
-    
+    BOOL                    _isLive;
+    NSInteger               _page;
 }
 
 -(NSMutableArray *)dataSource{
@@ -41,8 +41,6 @@
     [self showBlurBar];
     
     [self setUpViews];
-    
-    [self requestData];
     
 }
 
@@ -72,10 +70,36 @@
     [self.view addSubview:self.collectionView];
     [self.view sendSubviewToBack:self.collectionView];
     
+    self.collectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [self loadData:@(ReloadDiretionFirst)];
+        
+    }];
+    
+    self.collectionView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        
+        [self loadData:@(ReloadDiretionTop)];
+    }];
+    
 }
 
 #pragma mark - 请求数据
--(void)requestData{
+- (void)loadData:(NSNumber *)diretion {
+    
+    
+    switch ([diretion integerValue]) {
+        case ReloadDiretionFirst:{      //重新获取数据
+            _page = 1;
+        }
+            break;
+        case ReloadDiretionDown:
+            _page = 1;
+            break;
+        case ReloadDiretionTop:{//上拉加载如果上次没有获取到数据就不要再加加了
+        }
+            break;
+        default:
+            break;
+    }
 
     [_ZQHttpTool getGameHomeDataWithSuccesed:^(ZQHttpTool *manager, id responseObject) {
         
@@ -89,6 +113,14 @@
         }];
         
         [self.collectionView reloadData];
+        
+        //关闭刷新界面
+        if (self.collectionView.mj_header && [self.collectionView.mj_header isRefreshing]) {
+            [self.collectionView.mj_header endRefreshing];
+        }
+        if (self.collectionView.mj_footer && [self.collectionView.mj_footer isRefreshing]) {
+            [self.collectionView.mj_footer endRefreshing];
+        }
         
     } faild:^(ZQHttpTool *manager, NSError *error) {
         
