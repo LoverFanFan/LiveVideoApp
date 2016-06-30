@@ -71,6 +71,19 @@ typedef void (^httpRequestFailure)(ZQHttpTool *manager,NSError *error);
     }];
 }
 
+- (void)getGameDataLisetWithPage:(NSInteger)page
+                       Successed:(httpRequestSuccess)success
+                           Faile:(httpRequestFailure)failure{
+    
+    [[self AFNManager] GET:GAME_HOME_URL parameters:nil progress:^(NSProgress * _Nonnull downloadProgress) {
+        
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        success(self,responseObject);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        failure(self,error);
+    }];
+}
+
 -(void)getGameDetailDataWithGameID:(NSString *)gameID Succesed:(httpRequestSuccess)success faild:(httpRequestFailure)failure{
     
     [[self AFNManager] GET:GAME_DETAIL_URL(gameID)

@@ -41,6 +41,7 @@
     [self showBlurBar];
     
     [self setUpViews];
+    [self loadData:@(ReloadDiretionFirst)];
     
 }
 

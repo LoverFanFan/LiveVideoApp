@@ -26,11 +26,25 @@ typedef void (^httpRequestFailure)(ZQHttpTool *manager,NSError *error);
 /**
  *  获取游戏首页
  */
--(void)getGameHomeDataWithSuccesed:(httpRequestSuccess)success faild:(httpRequestFailure)failure;
+-(void)getGameHomeDataWithSuccesed:(httpRequestSuccess)success
+                             faild:(httpRequestFailure)failure;
+
+/**
+ *  获取游戏列表
+ *
+ *  @param page    页数
+ *  @param success 成功返回值
+ *  @param failure 失败返回值
+ */
+- (void)getGameDataLisetWithPage:(NSInteger)page
+                       Successed:(httpRequestSuccess)success
+                           Faile:(httpRequestFailure)failure;
 
 /**
  *  获取游戏详情
  */
--(void)getGameDetailDataWithGameID:(NSString *)gameID Succesed:(httpRequestSuccess)success faild:(httpRequestFailure)failure;
+-(void)getGameDetailDataWithGameID:(NSString *)gameID
+                          Succesed:(httpRequestSuccess)success
+                             faild:(httpRequestFailure)failure;
 
 @end
