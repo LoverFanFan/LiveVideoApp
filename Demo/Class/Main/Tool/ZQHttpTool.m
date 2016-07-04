@@ -75,7 +75,7 @@ typedef void (^httpRequestFailure)(ZQHttpTool *manager,NSError *error);
                        Successed:(httpRequestSuccess)success
                            Faile:(httpRequestFailure)failure{
     
-    [[self AFNManager] GET:GAME_HOME_URL parameters:nil progress:^(NSProgress * _Nonnull downloadProgress) {
+    [[self AFNManager] GET:GAME_DATA_LIST(page) parameters:nil progress:^(NSProgress * _Nonnull downloadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         success(self,responseObject);

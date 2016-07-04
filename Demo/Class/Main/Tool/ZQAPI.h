@@ -13,6 +13,8 @@
 #endif /* ZQAPI_h */
 //游戏首页
 #define GAME_HOME_URL @"http://www.zhanqi.tv/api/static/game.lists/16-1.json"
+
+#define GAME_DATA_LIST(page) [NSString stringWithFormat:@"http://www.zhanqi.tv/api/static/game.lists/16-%d.json",page]
 //游戏详情
 #define GAME_DETAIL_URL(gameID) [NSString stringWithFormat:@"http://www.zhanqi.tv/api/static/game.lives/%@/20-1.json",gameID]
 //直播地址

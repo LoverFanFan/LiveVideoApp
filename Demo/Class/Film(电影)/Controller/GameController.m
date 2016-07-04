@@ -23,6 +23,8 @@
 {
     BOOL                    _isLive;
     NSInteger               _page;
+    CGFloat                 _receiveAlpha;
+    UIImageView             *_topImageView;
 }
 
 -(NSMutableArray *)dataSource{
@@ -40,7 +42,10 @@
     
     [self showBlurBar];
     
+    [self createScaleHeadView];
+    
     [self setUpViews];
+    
     [self loadData:@(ReloadDiretionFirst)];
     
 }
@@ -48,6 +53,26 @@
 - (void)initRawData{
     
     _isLive = YES;
+}
+
+#pragma mark - 创建缩放头像视图
+- (void)createScaleHeadView
+{
+    UIView * topBkView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 78, 44)];
+    topBkView.backgroundColor = [UIColor clearColor];
+    topBkView.centerX = SCREEN_WIDTH/2;
+    topBkView.top     = 20;
+    
+    _topImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 5, 78, 78)];
+    _topImageView.backgroundColor = [UIColor whiteColor];
+    _topImageView.layer.cornerRadius = _topImageView.bounds.size.width / 2.;
+    _topImageView.layer.masksToBounds = YES;
+    _topImageView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    _topImageView.image = [UIImage imageNamed:@"head"];
+    [topBkView addSubview:_topImageView];
+    
+//    self.navigationItem.titleView = topBkView;
+    [self.navBarBackView addSubview: topBkView];
 }
 
 #pragma mark - 初始化各个view
@@ -88,33 +113,41 @@
     
     
     switch ([diretion integerValue]) {
-        case ReloadDiretionFirst:{      //重新获取数据
+        case ReloadDiretionFirst:{      ///重新获取数据
             _page = 1;
+            [self.dataSource removeAllObjects];
+            [self.collectionView.mj_footer resetNoMoreData];///重置上拉加载
         }
             break;
         case ReloadDiretionDown:
             _page = 1;
             break;
-        case ReloadDiretionTop:{//上拉加载如果上次没有获取到数据就不要再加加了
+        case ReloadDiretionTop:{///上拉加载如果上次没有获取到数据就不要再加加了
         }
             break;
         default:
             break;
     }
-
-    [_ZQHttpTool getGameHomeDataWithSuccesed:^(ZQHttpTool *manager, id responseObject) {
+    
+    [_ZQHttpTool getGameDataLisetWithPage:_page Successed:^(ZQHttpTool *manager, id responseObject) {
         
         NSMutableArray *arr = responseObject[@"data"][@"games"];
         
+        if (arr.count > 0) {
+            _page ++;
+        }else{
+            [self.collectionView.mj_footer endRefreshingWithNoMoreData];
+        }
+
         [arr enumerateObjectsUsingBlock:^(NSDictionary *  obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            
+
             ZQGameModel *model = [ZQGameModel mj_objectWithKeyValues:obj];
-            
+
             [self.dataSource addObject:model];
         }];
-        
+
         [self.collectionView reloadData];
-        
+
         //关闭刷新界面
         if (self.collectionView.mj_header && [self.collectionView.mj_header isRefreshing]) {
             [self.collectionView.mj_header endRefreshing];
@@ -122,11 +155,16 @@
         if (self.collectionView.mj_footer && [self.collectionView.mj_footer isRefreshing]) {
             [self.collectionView.mj_footer endRefreshing];
         }
-        
-    } faild:^(ZQHttpTool *manager, NSError *error) {
+    } Faile:^(ZQHttpTool *manager, NSError *error) {
         
         NSLog(@"%@",error);
-        
+        //关闭刷新界面
+        if (self.collectionView.mj_header && [self.collectionView.mj_header isRefreshing]) {
+            [self.collectionView.mj_header endRefreshing];
+        }
+        if (self.collectionView.mj_footer && [self.collectionView.mj_footer isRefreshing]) {
+            [self.collectionView.mj_footer endRefreshing];
+        }
     }];
 }
 
@@ -162,6 +200,38 @@
     detail.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detail animated:YES];
     
+}
+
+#pragma mark - 滑动代理
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    CGFloat offsetY = scrollView.contentOffset.y + self.collectionView.contentInset.top;//注意
+    
+    /**
+     *  1 - offsetY/num1 = 0.45;
+     0.45 为最终缩小倍率
+     offsetY 为纵偏移量
+     num1=300 为要计算的值
+     150/165  就是滑动多少距离后，完成缩放
+     */
+    
+    if (offsetY < 0 && offsetY >= -150) {
+        _topImageView.transform = CGAffineTransformMakeScale(1 + offsetY/(-300), 1 + offsetY/(-300));
+
+    }
+    else if (offsetY >= 0 && offsetY <= 165) {
+        _topImageView.transform = CGAffineTransformMakeScale(1 - offsetY/300, 1 - offsetY/300);
+    }
+    else if (offsetY > 165) {
+        _topImageView.transform = CGAffineTransformMakeScale(0.45, 0.45);
+    }
+    else if (offsetY < -150) {
+        _topImageView.transform = CGAffineTransformMakeScale(1.5, 1.5);
+    }
+    
+    CGRect frame = _topImageView.frame;
+    frame.origin.y = 5;
+    _topImageView.frame = frame;
 }
 
 @end
